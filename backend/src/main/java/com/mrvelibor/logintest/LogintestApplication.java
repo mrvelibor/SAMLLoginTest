@@ -1,6 +1,5 @@
 package com.mrvelibor.logintest;
 
-import com.github.ulisesbocchio.spring.boot.security.saml.annotation.EnableSAMLSSO;
 import com.mrvelibor.logintest.dao.LoginUser;
 import com.mrvelibor.logintest.repos.LoginCookieRepository;
 import com.mrvelibor.logintest.repos.LoginUserRepository;
@@ -15,7 +14,6 @@ import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletCon
 import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
-@EnableSAMLSSO
 public class LogintestApplication implements CommandLineRunner {
 
     public static void main(String[] args) {
