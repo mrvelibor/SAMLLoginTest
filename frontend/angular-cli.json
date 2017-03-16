@@ -6,14 +6,13 @@
   "apps": [
     {
       "root": "src",
-      "outDir": "../../NetBeans/logintest/src/main/resources/static",
+      "outDir": "../backend/src/main/resources/static",
       "assets": [
         "assets",
         "favicon.png"
       ],
       "index": "index.html",
       "main": "main.ts",
-      "test": "test.ts",
       "tsconfig": "tsconfig.json",
       "prefix": "app",
       "mobile": false,
