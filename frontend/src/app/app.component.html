@@ -1,0 +1,40 @@
+﻿<overlay></overlay>
+<div class="main-wrapper">
+    <header>
+        <ul class="navigation">
+            <li class="nav-title">
+                <a [routerLink]="['/']">LoginTest</a>
+            </li>
+            <ul class="nav-start">
+                <li [routerLinkActiveOptions]="{ exact: true }" [routerLinkActive]="['active']">
+                    <a [routerLink]="['/']">Home</a>
+                </li>
+                <li [routerLinkActive]="['active']">
+                    <a [routerLink]="['/tom']">Tom</a>
+                </li>
+                <li [routerLinkActive]="['active']">
+                    <a [routerLink]="['/jerry']">Jerry</a>
+                </li>
+            </ul>
+            <ul class="nav-end">
+                <li *ngIf="currentUser">
+                    <a>{{currentUser.username}}</a>
+                </li>
+                <li *ngIf="currentUser">
+                    <a (click)="logout()">Logout</a>
+                </li>
+
+                <li *ngIf="!currentUser" [routerLinkActive]="['active']">
+                    <a [routerLink]="['/login']">Login</a>
+                </li>
+            </ul>
+        </ul>
+    </header>
+    <alert></alert>
+    <div class="container">
+        <router-outlet style="flex: 0"></router-outlet>
+    </div>
+    <footer style="text-align: center">
+        by <a href="http://mrvelibor.com" target="none">Velibor Bačujkov</a>, 2017.
+    </footer>
+</div>

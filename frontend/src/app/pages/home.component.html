@@ -1,0 +1,14 @@
+<div style="text-align: center; margin: auto;">
+    <div *ngIf="currentUser">
+        <h2 class="text-center">
+            Welcome back, {{currentUser.username}}!<br>
+        </h2>
+    </div>
+    <div *ngIf="!currentUser">
+        <h2 class="text-center">
+            Welcome!<br>
+            <small>Please log in.</small>
+        </h2>
+        <login></login>
+    </div>
+</div>
