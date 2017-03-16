@@ -20,6 +20,9 @@ public class LogintestApplication implements CommandLineRunner {
         SpringApplication.run(LogintestApplication.class, args);
     }
     
+    //https://blog.frankel.ch/consider-replacing-spring-xml-configuration-with-javaconfig/#gsc.tab=0
+    //https://github.com/spring-projects/spring-security-saml
+    
     @Bean
     public EmbeddedServletContainerCustomizer customizer() {
         return container -> {
