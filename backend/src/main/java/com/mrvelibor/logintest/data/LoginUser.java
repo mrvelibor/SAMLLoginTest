@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.mrvelibor.logintest.dao;
+package com.mrvelibor.logintest.data;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -18,58 +18,54 @@ import javax.validation.constraints.NotNull;
 import java.util.Collection;
 import java.util.HashSet;
 
-/**
- *
- * @author Velibor
- */
 @Entity
 @Table(name = "users")
 public class LoginUser implements UserDetails {
-    
+
     @Id
     public String username;
-    
+
     @NotNull
     @JsonIgnore
     public String password;
-    
+
     @JsonInclude()
     @Transient
     public int type;
 
     @Transient
     private Collection<? extends GrantedAuthority> authorities;
-    
+
     public LoginUser() {
         authorities = new HashSet<>();
     }
-    
+
     public LoginUser(String username, String password) {
         this();
         this.username = username;
         this.password = password;
     }
-    
+
     public String getUsername() {
         return username;
     }
-    
+
     public void setUsername(String username) {
         this.username = username;
     }
-    
+
     public String getPassword() {
         return password;
     }
-    
+
     public void setPassword(String password) {
         this.password = password;
     }
-    
+
     public int getType() {
         return type;
     }
-    
+
     public void setType(int type) {
         this.type = type;
     }
@@ -106,5 +102,5 @@ public class LoginUser implements UserDetails {
                 username,
                 password);
     }
-    
+
 }

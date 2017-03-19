@@ -1,7 +1,7 @@
 package com.mrvelibor.logintest;
 
-import com.mrvelibor.logintest.dao.LoginUser;
-import com.mrvelibor.logintest.repos.LoginUserRepository;
+import com.mrvelibor.logintest.data.LoginUser;
+import com.mrvelibor.logintest.data.LoginUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;

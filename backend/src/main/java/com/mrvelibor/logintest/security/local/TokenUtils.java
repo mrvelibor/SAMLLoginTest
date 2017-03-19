@@ -1,6 +1,6 @@
-package com.mrvelibor.logintest.security;
+package com.mrvelibor.logintest.security.local;
 
-import com.mrvelibor.logintest.dao.LoginUser;
+import com.mrvelibor.logintest.data.LoginUser;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -22,7 +22,7 @@ public class TokenUtils {
   @Value("imanekatajnaveza")
   private String secret;
 
-  @Value("60000")
+  @Value("3600000")
   private Long expiration;
 
   public String getUsernameFromToken(String token) {
@@ -86,10 +86,6 @@ public class TokenUtils {
     return new Date(System.currentTimeMillis());
   }
 
-  private Date generateExpirationDate() {
-    return new Date(System.currentTimeMillis() + this.expiration * 1000);
-  }
-
   private Boolean isTokenExpired(String token) {
     final Date expiration = this.getExpirationDateFromToken(token);
     return expiration.before(this.generateCurrentDate());
@@ -113,7 +109,7 @@ public class TokenUtils {
   private String generateToken(Map<String, Object> claims) {
     return Jwts.builder()
       .setClaims(claims)
-      .setExpiration(this.generateExpirationDate())
+      .setExpiration(new Date(System.currentTimeMillis() + this.expiration))
       .signWith(SignatureAlgorithm.HS512, this.secret)
       .compact();
   }

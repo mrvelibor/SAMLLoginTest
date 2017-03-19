@@ -3,20 +3,15 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.mrvelibor.logintest.repos;
+package com.mrvelibor.logintest.data;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.repository.CrudRepository;
 
-import com.mrvelibor.logintest.dao.LoginUser;
+import com.mrvelibor.logintest.data.LoginUser;
 import org.springframework.data.repository.query.Param;
 
-/**
- *
- * @author Velibor
- */
 public interface LoginUserRepository extends JpaRepository<LoginUser, String> {
 
     LoginUser findByUsername(@Param("username") String username);
-    
+
 }
