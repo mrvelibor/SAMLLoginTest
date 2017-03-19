@@ -25,13 +25,9 @@ public class LoginUser implements UserDetails {
     @Id
     public String username;
 
-    @NotNull
+    //@NotNull
     @JsonIgnore
     public String password;
-
-    @JsonInclude()
-    @Transient
-    public int type;
 
     @Transient
     private Collection<? extends GrantedAuthority> authorities;
@@ -60,14 +56,6 @@ public class LoginUser implements UserDetails {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public int getType() {
-        return type;
-    }
-
-    public void setType(int type) {
-        this.type = type;
     }
 
     @Override

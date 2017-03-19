@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.saml.metadata.MetadataManager;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -31,7 +32,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.HashSet;
 import java.util.Set;
 
-@RestController
+@Controller
 @RequestMapping("/saml")
 public class SSOController {
 
@@ -43,35 +44,22 @@ public class SSOController {
     private MetadataManager metadata;
 
     @RequestMapping(value = "/idpSelection", method = RequestMethod.GET)
-    public Set<String> idpSelection(HttpServletRequest request, Model model) {
+    public String idpSelection(HttpServletRequest request, Model model) {
         if (!(SecurityContextHolder.getContext().getAuthentication() instanceof AnonymousAuthenticationToken)) {
             LOG.warn("The current user is already logged.");
-            return new HashSet<>();
+            return "redirect:/landing";
         } else {
-            Set<String> idps = metadata.getIDPEntityNames();
-            for (String idp : idps)
-                LOG.info("Configured Identity Provider for SSO: " + idp);
-            model.addAttribute("idps", idps);
-            return idps;
-            /*if (isForwarded(request)) {
+            if (isForwarded(request)) {
 				Set<String> idps = metadata.getIDPEntityNames();
 				for (String idp : idps)
 					LOG.info("Configured Identity Provider for SSO: " + idp);
 				model.addAttribute("idps", idps);
-				return idps;
+                return "saml/idpselection";
 			} else {
 				LOG.warn("Direct accesses to '/idpSelection' route are not allowed");
-				return new HashSet<>();
-			}*/
+                return "redirect:/";
+			}
         }
-    }
-
-    @RequestMapping(value = "/test", method = RequestMethod.GET)
-    public Set<String> test(HttpServletRequest request, Model model) {
-        Set<String> set = new HashSet<>();
-        set.add("alo");
-        set.add("bre");
-        return set;
     }
 
     /*
