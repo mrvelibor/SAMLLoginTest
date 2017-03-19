@@ -7,11 +7,16 @@ package com.mrvelibor.logintest.dao;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
+import java.util.Collection;
+import java.util.HashSet;
 
 /**
  *
@@ -19,7 +24,7 @@ import javax.validation.constraints.NotNull;
  */
 @Entity
 @Table(name = "users")
-public class LoginUser {
+public class LoginUser implements UserDetails {
     
     @Id
     public String username;
@@ -31,12 +36,16 @@ public class LoginUser {
     @JsonInclude()
     @Transient
     public int type;
+
+    @Transient
+    private Collection<? extends GrantedAuthority> authorities;
     
     public LoginUser() {
-        
+        authorities = new HashSet<>();
     }
     
     public LoginUser(String username, String password) {
+        this();
         this.username = username;
         this.password = password;
     }
@@ -66,11 +75,36 @@ public class LoginUser {
     }
 
     @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return authorities;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
+    @Override
     public String toString() {
         return String.format(
                 "LoginUser[username='%s'; password='%s']",
                 username,
                 password);
-    }   
+    }
     
 }

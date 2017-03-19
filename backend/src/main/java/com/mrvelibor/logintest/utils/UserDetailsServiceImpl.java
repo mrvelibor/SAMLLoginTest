@@ -23,7 +23,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     if (user == null) {
       throw new UsernameNotFoundException(String.format("No user found with username '%s'.", username));
     } else {
-      return new StupidUser(user.getUsername(), user.getPassword(), new HashSet<>());
+      return new LoginUser(user.getUsername(), user.getPassword());
     }
   }
 
