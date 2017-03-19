@@ -5,6 +5,7 @@
  */
 package com.mrvelibor.logintest.repos;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.CrudRepository;
 
 import com.mrvelibor.logintest.dao.LoginUser;
@@ -14,7 +15,7 @@ import org.springframework.data.repository.query.Param;
  *
  * @author Velibor
  */
-public interface LoginUserRepository extends CrudRepository<LoginUser, String> {
+public interface LoginUserRepository extends JpaRepository<LoginUser, String> {
 
     LoginUser findByUsername(@Param("username") String username);
     

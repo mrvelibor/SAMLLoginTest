@@ -27,11 +27,14 @@ export class AlertService {
     }
 
     error(error: any, keepAfterNavigationChange = false) {
-        let message = error.status + ' ' + error.statusText;
+        let message = error.status;
         try {
             let body = JSON.parse(error._body);
+            if (body.error) {
+              message += ' ' + body.error;
+            }
             if (body.message) {
-                message += ': ' + body.message;
+              message += ': ' + body.message;
             }
         }
         catch (Error) {

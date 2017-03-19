@@ -23,6 +23,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 
+import com.mrvelibor.logintest.repos.LoginUserRepository;
+import com.mrvelibor.logintest.utils.AuthenticationTokenFilter;
+import com.mrvelibor.logintest.utils.SecurityService;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.protocol.Protocol;
@@ -40,6 +43,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configurers.provisioning.InMemoryUserDetailsManagerConfigurer;
@@ -49,6 +53,7 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.saml.SAMLAuthenticationProvider;
@@ -97,17 +102,30 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.channel.ChannelProcessingFilter;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
- 
+import org.springframework.test.context.web.WebAppConfiguration;
+
+import javax.sql.DataSource;
+
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(securedEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
-    
+
+    @Autowired
+    private UserDetailsService userDetailsService;
+
+    @Autowired
+    private SecurityService securityService;
+
+    @Autowired
+    private DataSource dataSource;
+
     @Bean
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
@@ -125,6 +143,28 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
+
+    @Bean
+    public AuthenticationTokenFilter authenticationTokenFilterBean() throws Exception {
+        AuthenticationTokenFilter authenticationTokenFilter = new AuthenticationTokenFilter();
+        authenticationTokenFilter.setAuthenticationManager(authenticationManagerBean());
+        return authenticationTokenFilter;
+    }
+
+    @Bean
+    public SecurityService securityService() {
+        return this.securityService;
+    }
+
+    @Override
+    public void configure(WebSecurity web) throws Exception {
+        web.ignoring()
+                .antMatchers("/*.{js}")
+                .antMatchers("/*.{map}")
+                .antMatchers("/assets/**")
+                .antMatchers("*.{ico}")
+                .antMatchers("/index.{html}");
+    }
      
     /**
      * Defines the web based security configuration.
@@ -134,7 +174,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
      */
     @Override  
     protected void configure(HttpSecurity http) throws Exception {
-        http
+        /*http
             .httpBasic()
                 .authenticationEntryPoint(samlEntryPoint());
         http
@@ -145,19 +185,20 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .addFilterAfter(samlFilter(), BasicAuthenticationFilter.class);
         http        
             .authorizeRequests()
-            .antMatchers("/").permitAll()
-            .antMatchers("/error").permitAll()
-            .antMatchers("/saml/**").permitAll()
-            .anyRequest().authenticated();
+                .antMatchers("/").permitAll()
+                .antMatchers("/error").permitAll()
+                .antMatchers("/saml/**").permitAll()
+                .anyRequest().authenticated();
         http
             .logout()
-                .logoutSuccessUrl("/");
+                .logoutSuccessUrl("/");*/
         
-        http
+        /*http
             .authorizeRequests()
                 .antMatchers("/api/authenticate").anonymous()
                 .antMatchers("/").anonymous()
                 .antMatchers("/favicon.ico").anonymous()
+                .antMatchers("/login").anonymous()
                 .antMatchers("/api/**").authenticated()
             .and()
             .csrf()
@@ -169,7 +210,25 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
             .logout()
-                .permitAll();
+                .permitAll();*/
+
+        http
+            .csrf()
+                .disable()
+            //.exceptionHandling()
+                //.authenticationEntryPoint(this.unauthorizedHandler)
+            //.and()
+            .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .and()
+            .authorizeRequests()
+                .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                .antMatchers("/login").anonymous()
+                .anyRequest().authenticated();
+
+        // Custom JWT based authentication
+        http
+            .addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class);
     }
  
     /**
@@ -190,16 +249,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         configurer.withUser("test")
                     .password(passwordEncoder().encode("testing"))
                     .roles("TESTER");
-    }
 
-    @Override
-    public void configure(WebSecurity web) throws Exception {
-        web.ignoring()
-                .antMatchers("/*.{js}")
-                .antMatchers("/*.{map}")
-                .antMatchers("/assets/**")
-                .antMatchers("*.{ico}")
-                .antMatchers("/index.{html}");
+        auth
+            .jdbcAuthentication()
+                .usersByUsernameQuery("select username, password, 1 from users where username=?")
+                .authoritiesByUsernameQuery("select username, 'ADMIN' from users where username=?")
+                .dataSource(dataSource)
+                .passwordEncoder(passwordEncoder());
     }
 
     /*@Bean
@@ -374,32 +430,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         String defaultKey = "apollo";
         return new JKSKeyManager(storeFile, storePass, passwords, defaultKey);
     }
- 
-    // Setup TLS Socket Factory
-    /*@Bean
-    public TLSProtocolConfigurer tlsProtocolConfigurer() {
-    	return new TLSProtocolConfigurer();
-    }
-    
-    @Bean
-    public ProtocolSocketFactory socketFactory() {
-        return new TLSProtocolSocketFactory(keyManager(), null, "default");
-    }
-
-    @Bean
-    public Protocol socketFactoryProtocol() {
-        return new Protocol("https", socketFactory(), 443);
-    }
-
-    @Bean
-    public MethodInvokingFactoryBean socketFactoryInitialization() {
-        MethodInvokingFactoryBean methodInvokingFactoryBean = new MethodInvokingFactoryBean();
-        methodInvokingFactoryBean.setTargetClass(Protocol.class);
-        methodInvokingFactoryBean.setTargetMethod("registerProtocol");
-        Object[] args = {"https", socketFactoryProtocol()};
-        methodInvokingFactoryBean.setArguments(args);
-        return methodInvokingFactoryBean;
-    }*/
     
     @Bean
     public WebSSOProfileOptions defaultWebSSOProfileOptions() {
