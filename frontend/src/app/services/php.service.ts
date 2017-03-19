@@ -4,17 +4,19 @@ import 'rxjs/add/operator/map'
 
 @Injectable()
 export class PhpService {
-    protected static _host: string = "http://localhost:8080";
 
-    constructor(protected http: Http) {
-    }
+  protected static _host: string = "http://localhost:8080";
 
-    protected static createOptions(content_headers = true) {
-        let headers = new Headers();
-        if(content_headers) {
-            headers.append('Content-Type', 'application/x-www-form-urlencoded');
-        }
-        return new RequestOptions({headers: headers, withCredentials: true});
+  constructor(protected http: Http) {
+  }
+
+  protected static createOptions(token = null) {
+    let headers = new Headers();
+    headers.append('Content-Type', 'application/json');
+    if (token) {
+      headers.append('X-Auth-Token', token)
     }
+    return new RequestOptions({headers: headers, withCredentials: true});
+  }
 
 }

@@ -10,61 +10,78 @@ import { Observable } from "rxjs/Observable";
 @Injectable()
 export class AuthenticationService extends PhpService {
 
-    private _userSource;
-    user$;
+  private _userSource;
+  private _user;
+  user$;
 
-    constructor(http: Http,
-                private cookieService: CookieService) {
-        super(http);
-        let user = JSON.parse(localStorage.getItem('user'));
-        this._userSource = new BehaviorSubject<User>(user);
-        this.user$ = this._userSource.asObservable();
+  constructor(http: Http) {
+    super(http);
+    let user = JSON.parse(localStorage.getItem('user'));
+    this._userSource = new BehaviorSubject<User>(user);
+    this.user$ = this._userSource.asObservable();
+    this.user$.subscribe(user => this._user = user);
+  }
+
+  private handleResponse(res: Response) {
+    let user = res.json();
+    if (!user) {
+      console.log(res);
+      return;
+    }
+    localStorage.setItem('user', JSON.stringify(user));
+    this._userSource.next(user);
+    return user;
+  }
+
+  login(username, password) {
+    let params = new User();
+    params.username = username;
+    params.password = password;
+    let body = JSON.stringify(params);
+    console.log(body);
+
+    let options = PhpService.createOptions();
+    return this.http.post(
+      PhpService._host + '/login',
+      body,
+      options
+    ).map((res: Response) => {
+      return this.handleResponse(res);
+    });
+  }
+
+  logout() {
+    let user = this._user;
+    if(!user) {
+      return;
     }
 
-    private handleResponse(res: Response) {
-        let user = res.json();
-        if(!user) {
-            console.log(res);
-            return;
-        }
-        let token = this.cookieService.get('token');
-        if(!token) {
-            console.log('No token');
-            return;
-        }
-        localStorage.setItem('user', JSON.stringify(user));
-        this._userSource.next(user);
-        return user;
+    localStorage.removeItem('user');
+    this._userSource.next(null);
+
+    let options = PhpService.createOptions(user.token);
+    return this.http.delete(
+      PhpService._host + '/logout',
+      options
+    ).map((res: Response) => {
+      localStorage.removeItem('user');
+      this._userSource.next(null);
+      return res.json();
+    });
+  }
+
+  test() {
+    let token = null;
+    if(this._user) {
+      token = this._user.token;
     }
 
-    login(username, password) {
-        let body =
-            'username=' + encodeURIComponent(username) +
-            '&password=' + encodeURIComponent(password);
-        let options = PhpService.createOptions();
-        return this.http.post(
-            PhpService._host + '/login',
-            body,
-            options
-        ).map((res: Response) => {
-            return this.handleResponse(res);
-        });
-    }
-
-    logout() {
-        this.cookieService.remove('token');
-        localStorage.removeItem('user');
-        this._userSource.next(null);
-
-        let options = PhpService.createOptions();
-        return this.http.delete(
-            PhpService._host + '/logout',
-            options
-        ).map((res: Response) => {
-            this.cookieService.remove('token');
-            localStorage.removeItem('user');
-            this._userSource.next(null);
-            return res.json();
-        });
-    }
+    let options = PhpService.createOptions(token);
+    return this.http.get(
+      PhpService._host + '/protektor',
+      options
+    ).map((res: Response) => {
+      return res;
+    });
+  }
 }
