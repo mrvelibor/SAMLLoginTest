@@ -22,8 +22,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class AuthenticationController {
 
-    private final Logger logger = Logger.getLogger(this.getClass());
-
     @Value("$X-Auth-Token")
     private String tokenHeader;
 

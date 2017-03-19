@@ -100,7 +100,8 @@ public class LoginUser implements UserDetails {
         return String.format(
                 "LoginUser[username='%s'; password='%s']",
                 username,
-                password);
+                password
+        );
     }
 
 }

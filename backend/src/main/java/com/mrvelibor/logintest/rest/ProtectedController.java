@@ -7,13 +7,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("protektor")
+@RequestMapping("protected")
 public class ProtectedController {
 
-    @RequestMapping(method = RequestMethod.GET)
-    //@PreAuthorize("hasRole('ADMIN')")
-    @PreAuthorize("@securityService.hasProtectedAccess()")
-    public ResponseEntity<?> getDaHoney() {
+    @RequestMapping(value = "test", method = RequestMethod.GET)
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> test() {
         return ResponseEntity.ok("You are authorized!");
     }
 

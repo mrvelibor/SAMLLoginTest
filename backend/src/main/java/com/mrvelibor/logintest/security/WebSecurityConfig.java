@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 
-import com.mrvelibor.logintest.security.local.SecurityService;
 import com.mrvelibor.logintest.security.saml.SAMLUserDetailsServiceImpl;
 import com.mrvelibor.logintest.security.local.AuthenticationTokenFilter;
 import org.apache.commons.httpclient.HttpClient;
@@ -40,7 +39,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -92,12 +90,14 @@ import org.springframework.security.saml.websso.WebSSOProfileOptions;
 import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.FilterChainProxy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.channel.ChannelProcessingFilter;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import javax.sql.DataSource;
@@ -108,14 +108,15 @@ import javax.sql.DataSource;
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
-    private SecurityService securityService;
+    private DataSource dataSource;
 
     @Autowired
-    private DataSource dataSource;
+    private SAMLUserDetailsServiceImpl samlUserDetailsServiceImpl;
 
     @Override
     public void configure(WebSecurity web) throws Exception {
-        web.ignoring()
+        web
+            .ignoring()
                 .antMatchers("/*.{js}")
                 .antMatchers("/*.{map}")
                 .antMatchers("/assets/**")
@@ -127,41 +128,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         /*http
             .httpBasic()
-                .authenticationEntryPoint(samlEntryPoint());
-        http
-        	.csrf()
-        		.disable();
-        http
-            .addFilterBefore(metadataGeneratorFilter(), ChannelProcessingFilter.class)
-            .addFilterAfter(samlFilter(), BasicAuthenticationFilter.class);
-        http
-            .authorizeRequests()
-                .antMatchers("/").permitAll()
-                .antMatchers("/error").permitAll()
-                .antMatchers("/saml/**").permitAll()
-                .anyRequest().authenticated();
-        http
-            .logout()
-                .logoutSuccessUrl("/");*/
-
-        /*http
-            .authorizeRequests()
-                .antMatchers("/api/authenticate").anonymous()
-                .antMatchers("/").anonymous()
-                .antMatchers("/favicon.ico").anonymous()
-                .antMatchers("/login").anonymous()
-                .antMatchers("/api/**").authenticated()
-            .and()
-            .csrf()
-                .disable()
-                .headers()
-                .frameOptions().disable()
-            .and()
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            .and()
-            .logout()
-                .permitAll();*/
+                .authenticationEntryPoint(samlEntryPoint());*/
 
         http
             .csrf()
@@ -170,13 +137,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
             .authorizeRequests()
-                .antMatchers("/").permitAll()
-                .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                .antMatchers("/", "/saml/**").permitAll()
                 .antMatchers("/login").anonymous()
-                .anyRequest().authenticated();
+                .anyRequest().authenticated()
+            .and()
+            .logout()
+                .permitAll()
+                .logoutSuccessUrl("/");
 
-        // Custom JWT based authentication
         http
+            .addFilterBefore(metadataGeneratorFilter(), ChannelProcessingFilter.class)
+            .addFilterAfter(samlFilter(), BasicAuthenticationFilter.class)
             .addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class);
     }
 
@@ -210,80 +181,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         authenticationTokenFilter.setAuthenticationManager(authenticationManagerBean());
         return authenticationTokenFilter;
     }
-
-    @Bean
-    public SecurityService securityService() {
-        return this.securityService;
-    }
-
-    /*@Bean
-    @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
-    }
-    
-    @Bean
-    public FilterChainProxy samlFilter() {
-        List<SecurityFilterChain> filterChains = new ArrayList<>();
-        filterChains.add(new DefaultSecurityFilterChain(
-                new AntPathRequestMatcher("/saml/login/**", "samlEntryPoint")
-        ));
-        filterChains.add(new DefaultSecurityFilterChain(
-                new AntPathRequestMatcher("/saml/logout/**", "samlLogoutFilter")
-        ));
-        filterChains.add(new DefaultSecurityFilterChain(
-                new AntPathRequestMatcher("/saml/metadata/**", "metadataDisplayFilter")
-        ));
-        filterChains.add(new DefaultSecurityFilterChain(
-                new AntPathRequestMatcher("/saml/SSO/**", "samlWebSSOProcessingFilter")
-        ));
-        filterChains.add(new DefaultSecurityFilterChain(
-                new AntPathRequestMatcher("/saml/SSOHoK/**", "samlWebSSOHoKProcessingFilter")
-        ));
-        filterChains.add(new DefaultSecurityFilterChain(
-                new AntPathRequestMatcher("/saml/SingleLogout/**", "samlLogoutProcessingFilter")
-        ));
-        filterChains.add(new DefaultSecurityFilterChain(
-                new AntPathRequestMatcher("/saml/discovery/**", "samlIDPDiscovery")
-        ));
-        FilterChainProxy samlFilter = new FilterChainProxy(filterChains);
-        return samlFilter;
-    }
-    
-    @Bean
-    public CachingMetadataManager metadata(ParserPool parserPool) throws MetadataProviderException, ResourceException {
-        List<MetadataProvider> providers = new ArrayList<>();
-        
-        ResourceBackedMetadataProvider resourceBackedProvider = new ResourceBackedMetadataProvider(new Timer(), new ClasspathResource("/metadata/idp.xml"));
-        resourceBackedProvider.setParserPool(parserPool);
-        providers.add(new ExtendedMetadataDelegate(resourceBackedProvider, new ExtendedMetadata()));
-        
-        HTTPMetadataProvider httpProvider = new HTTPMetadataProvider("http://idp.ssocircle.com/idp-meta.xml", 15000);
-        httpProvider.setParserPool(parserPool);
-        providers.add(httpProvider);
-        
-        CachingMetadataManager manager = new CachingMetadataManager(providers);
-        return manager;
-    }
-    
-    @Bean
-    public StaticBasicParserPool parserPool() throws XMLParserException {
-        StaticBasicParserPool parserPool = new StaticBasicParserPool();
-        parserPool.initialize();
-        return parserPool;
-    }
-    
-    @Bean
-    public JKSKeyManager keyManager() {
-        Resource resource = getApplicationContext().getResource("security/samlKeystore.jks");
-        Map<String, String> map = new HashMap<>();
-        map.put("apollo", "nalle123");
-        JKSKeyManager keyManager = new JKSKeyManager(resource, "nalle123", map, "apollo");
-        return keyManager;
-    }*/
-
-    @Autowired
-    private SAMLUserDetailsServiceImpl samlUserDetailsServiceImpl;
 
     // Initialization of the velocity engine
     @Bean
@@ -511,8 +408,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     // Logout handler terminating local session
     @Bean
     public SecurityContextLogoutHandler logoutHandler() {
-        SecurityContextLogoutHandler logoutHandler =
-                new SecurityContextLogoutHandler();
+        SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
         logoutHandler.setInvalidateHttpSession(true);
         logoutHandler.setClearAuthentication(true);
         return logoutHandler;

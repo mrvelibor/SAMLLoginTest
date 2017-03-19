@@ -78,7 +78,7 @@ export class AuthenticationService extends PhpService {
 
     let options = PhpService.createOptions(token);
     return this.http.get(
-      PhpService._host + '/protektor',
+      PhpService._host + '/protected/test',
       options
     ).map((res: Response) => {
       return res;
