@@ -133,9 +133,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http
             .csrf()
                 .disable()
-            .sessionManagement()
+            /*.sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            .and()
+            .and()*/
             .authorizeRequests()
                 .antMatchers("/", "/error", "/saml/**").permitAll()
                 .antMatchers("/login").anonymous()
@@ -154,14 +154,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth
-            .authenticationProvider(samlAuthenticationProvider());
-
-        auth
             .jdbcAuthentication()
                 .usersByUsernameQuery("select username, password, 1 from users where username=?")
                 .authoritiesByUsernameQuery("select username, 'ROLE_USER' from users where username=?")
                 .dataSource(dataSource)
                 .passwordEncoder(passwordEncoder());
+
+        auth
+            .authenticationProvider(samlAuthenticationProvider());
     }
 
     @Bean

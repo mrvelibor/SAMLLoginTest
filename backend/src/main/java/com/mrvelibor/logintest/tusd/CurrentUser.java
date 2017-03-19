@@ -14,21 +14,11 @@
  * limitations under the License. 
  */
 
-package com.mrvelibor.logintest.mvc;
+package com.mrvelibor.logintest.tusd;
 
-import com.mrvelibor.logintest.tusd.CurrentUser;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
+import java.lang.annotation.*;
 
-@Controller
-public class LandingController {
-
-	@RequestMapping("/landing")
-	public String landing(@CurrentUser User user, Model model) {
-		model.addAttribute("username", 	user.getUsername());
-		return "landing";
-	}
-
-}
+@Target(ElementType.PARAMETER)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+public @interface CurrentUser {}

@@ -53,7 +53,10 @@ public class SAMLUserDetailsServiceImpl implements SAMLUserDetailsService {
         }
         LOG.info(user + " has logged in");
 
-        return user;
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        GrantedAuthority authority = new SimpleGrantedAuthority("ROLE_USER");
+        authorities.add(authority);
+        return new User(userId, "<abc123>", true, true, true, true, authorities);
     }
 
 }
