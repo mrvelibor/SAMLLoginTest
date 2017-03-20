@@ -133,11 +133,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http
             .csrf()
                 .disable()
-            .sessionManagement()
+            /*.sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            .and()
+            .and()*/
             .authorizeRequests()
-                .antMatchers("/", "/saml/**").permitAll()
+                .antMatchers("/", "/error", "/saml/**").permitAll()
                 .antMatchers("/login").anonymous()
                 .anyRequest().authenticated()
             .and()
@@ -146,22 +146,22 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .logoutSuccessUrl("/");
 
         http
+            .addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(metadataGeneratorFilter(), ChannelProcessingFilter.class)
-            .addFilterAfter(samlFilter(), BasicAuthenticationFilter.class)
-            .addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class);
+            .addFilterAfter(samlFilter(), BasicAuthenticationFilter.class);
     }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth
-            .authenticationProvider(samlAuthenticationProvider());
-
         auth
             .jdbcAuthentication()
                 .usersByUsernameQuery("select username, password, 1 from users where username=?")
                 .authoritiesByUsernameQuery("select username, 'ROLE_USER' from users where username=?")
                 .dataSource(dataSource)
                 .passwordEncoder(passwordEncoder());
+
+        auth
+            .authenticationProvider(samlAuthenticationProvider());
     }
 
     @Bean
@@ -334,7 +334,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     @Qualifier("metadata")
     public CachingMetadataManager metadata() throws MetadataProviderException {
-        List<MetadataProvider> providers = new ArrayList<MetadataProvider>();
+        List<MetadataProvider> providers = new ArrayList<>();
         providers.add(ssoCircleExtendedMetadataProvider());
         return new CachingMetadataManager(providers);
     }
@@ -343,7 +343,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public MetadataGenerator metadataGenerator() {
         MetadataGenerator metadataGenerator = new MetadataGenerator();
-        metadataGenerator.setEntityId("com:mrvelibor:logintest:sp");
+        metadataGenerator.setEntityId("com:vdenotaris:spring:sp");
         metadataGenerator.setExtendedMetadata(extendedMetadata());
         metadataGenerator.setIncludeDiscoveryExtension(false);
         metadataGenerator.setKeyManager(keyManager());

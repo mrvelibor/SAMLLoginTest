@@ -19,8 +19,11 @@ package com.mrvelibor.logintest.security.saml;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.mrvelibor.logintest.data.LoginUser;
+import com.mrvelibor.logintest.data.LoginUserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -35,23 +38,25 @@ public class SAMLUserDetailsServiceImpl implements SAMLUserDetailsService {
     // Logger
     private static final Logger LOG = LoggerFactory.getLogger(SAMLUserDetailsServiceImpl.class);
 
-    public Object loadUserBySAML(SAMLCredential credential)
-            throws UsernameNotFoundException {
+    @Autowired
+    private LoginUserRepository userRepository;
 
-        // The method is supposed to identify local account of user referenced by
-        // data in the SAML assertion and return UserDetails object describing the user.
+    // The method is supposed to identify local account of user referenced by
+    // data in the SAML assertion and return UserDetails object describing the user.
+    public Object loadUserBySAML(SAMLCredential credential) throws UsernameNotFoundException {
+        String userId = credential.getNameID().getValue();
+        LOG.info(userId + " is logging in");
 
-        String userID = credential.getNameID().getValue();
+        LoginUser user = userRepository.findByUsername(userId);
+        if(user == null) {
+            user = userRepository.save(new LoginUser(userId, ""));
+        }
+        LOG.info(user + " has logged in");
 
-        LOG.info(userID + " is logged in");
-        List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
+        List<GrantedAuthority> authorities = new ArrayList<>();
         GrantedAuthority authority = new SimpleGrantedAuthority("ROLE_USER");
         authorities.add(authority);
-
-        // In a real scenario, this implementation has to locate user in a arbitrary
-        // dataStore based on information present in the SAMLCredential and
-        // returns such a date in a form of application specific UserDetails object.
-        return new User(userID, "<abc123>", true, true, true, true, authorities);
+        return new User(userId, "<abc123>", true, true, true, true, authorities);
     }
 
 }
