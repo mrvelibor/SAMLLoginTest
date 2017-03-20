@@ -14,9 +14,9 @@
  * limitations under the License. 
  */
 
-package com.mrvelibor.logintest.mvc;
+package olympus.portal.mvc;
 
-import com.mrvelibor.logintest.security.saml.CurrentUser;
+import olympus.portal.security.saml.CurrentUser;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

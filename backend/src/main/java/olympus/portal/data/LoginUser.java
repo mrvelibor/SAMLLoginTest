@@ -1,4 +1,4 @@
-package com.mrvelibor.logintest.data;
+package olympus.portal.data;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;

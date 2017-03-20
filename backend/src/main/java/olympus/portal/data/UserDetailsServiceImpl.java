@@ -1,4 +1,4 @@
-package com.mrvelibor.logintest.data;
+package olympus.portal.data;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;

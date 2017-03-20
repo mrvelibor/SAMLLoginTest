@@ -1,9 +1,8 @@
-package com.mrvelibor.logintest.rest;
+package olympus.portal.rest;
 
-import com.mrvelibor.logintest.rest.json.AuthenticationRequest;
-import com.mrvelibor.logintest.rest.json.AuthenticationResponse;
-import com.mrvelibor.logintest.security.local.TokenUtils;
-import org.apache.log4j.Logger;
+import olympus.portal.rest.json.AuthenticationRequest;
+import olympus.portal.rest.json.AuthenticationResponse;
+import olympus.portal.security.local.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;

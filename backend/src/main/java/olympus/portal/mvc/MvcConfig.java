@@ -14,9 +14,9 @@
  * limitations under the License. 
  */
 
-package com.mrvelibor.logintest.mvc;
+package olympus.portal.mvc;
 
-import com.mrvelibor.logintest.security.saml.CurrentUserHandlerMethodArgumentResolver;
+import olympus.portal.security.saml.CurrentUserHandlerMethodArgumentResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;

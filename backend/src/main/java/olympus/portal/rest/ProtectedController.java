@@ -1,4 +1,4 @@
-package com.mrvelibor.logintest.rest;
+package olympus.portal.rest;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

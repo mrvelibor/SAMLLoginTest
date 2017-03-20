@@ -1,4 +1,4 @@
-package com.mrvelibor.logintest.rest.json;
+package olympus.portal.rest.json;
 
 import lombok.Data;
 

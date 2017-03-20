@@ -1,6 +1,6 @@
-package com.mrvelibor.logintest.security.local;
+package olympus.portal.security.local;
 
-import com.mrvelibor.logintest.data.LoginUser;
+import olympus.portal.data.LoginUser;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;

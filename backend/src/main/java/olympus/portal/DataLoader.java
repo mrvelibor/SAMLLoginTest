@@ -1,7 +1,7 @@
-package com.mrvelibor.logintest;
+package olympus.portal;
 
-import com.mrvelibor.logintest.data.LoginUser;
-import com.mrvelibor.logintest.data.LoginUserRepository;
+import olympus.portal.data.LoginUser;
+import olympus.portal.data.LoginUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;

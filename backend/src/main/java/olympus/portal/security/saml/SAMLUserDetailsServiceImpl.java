@@ -14,13 +14,13 @@
  * limitations under the License. 
  */
 
-package com.mrvelibor.logintest.security.saml;
+package olympus.portal.security.saml;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mrvelibor.logintest.data.LoginUser;
-import com.mrvelibor.logintest.data.LoginUserRepository;
+import olympus.portal.data.LoginUser;
+import olympus.portal.data.LoginUserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

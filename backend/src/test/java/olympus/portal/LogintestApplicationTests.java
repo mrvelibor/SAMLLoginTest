@@ -1,4 +1,4 @@
-package com.mrvelibor.logintest;
+package olympus.portal;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

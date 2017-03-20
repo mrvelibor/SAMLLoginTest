@@ -1,6 +1,5 @@
-package com.mrvelibor.logintest.security.local;
+package olympus.portal.security.local;
 
-import com.mrvelibor.logintest.security.local.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

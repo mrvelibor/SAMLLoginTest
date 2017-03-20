@@ -14,7 +14,7 @@
  * limitations under the License. 
  */
 
-package com.mrvelibor.logintest.security;
+package olympus.portal.security;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,8 +23,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 
-import com.mrvelibor.logintest.security.saml.SAMLUserDetailsServiceImpl;
-import com.mrvelibor.logintest.security.local.AuthenticationTokenFilter;
+import olympus.portal.security.saml.SAMLUserDetailsServiceImpl;
+import olympus.portal.security.local.AuthenticationTokenFilter;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.velocity.app.VelocityEngine;
@@ -46,7 +46,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.saml.SAMLAuthenticationProvider;
