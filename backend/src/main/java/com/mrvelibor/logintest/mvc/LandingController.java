@@ -16,7 +16,7 @@
 
 package com.mrvelibor.logintest.mvc;
 
-import com.mrvelibor.logintest.tusd.CurrentUser;
+import com.mrvelibor.logintest.security.saml.CurrentUser;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

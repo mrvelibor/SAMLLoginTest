@@ -16,7 +16,7 @@
 
 package com.mrvelibor.logintest.mvc;
 
-import com.mrvelibor.logintest.tusd.CurrentUserHandlerMethodArgumentResolver;
+import com.mrvelibor.logintest.security.saml.CurrentUserHandlerMethodArgumentResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;

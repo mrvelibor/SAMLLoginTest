@@ -39,10 +39,10 @@ public class AuthenticationController {
 
         // Perform the authentication
         Authentication authentication = this.authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(
-                authenticationRequest.getUsername(),
-                authenticationRequest.getPassword()
-            )
+                new UsernamePasswordAuthenticationToken(
+                        authenticationRequest.getUsername(),
+                        authenticationRequest.getPassword()
+                )
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
@@ -52,6 +52,17 @@ public class AuthenticationController {
 
         // Return the token
         return ResponseEntity.ok(new AuthenticationResponse(token, authenticationRequest.getUsername(), "1"));
+    }
+
+    @RequestMapping(value = "auth", method = RequestMethod.GET)
+    public ResponseEntity<?> authenticationCheck() throws AuthenticationException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        UserDetails userDetails = this.userDetailsService.loadUserByUsername(authentication.getName());
+        String token = this.tokenUtils.generateToken(userDetails);
+
+        // Return the token
+        return ResponseEntity.ok(new AuthenticationResponse(token, authentication.getName(), "1"));
     }
 
 }

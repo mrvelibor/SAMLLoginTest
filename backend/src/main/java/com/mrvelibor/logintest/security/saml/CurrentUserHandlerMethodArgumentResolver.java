@@ -14,7 +14,7 @@
  * limitations under the License. 
  */
 
-package com.mrvelibor.logintest.tusd;
+package com.mrvelibor.logintest.security.saml;
 
 import org.springframework.core.MethodParameter;
 import org.springframework.security.core.Authentication;

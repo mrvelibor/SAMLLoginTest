@@ -14,7 +14,7 @@
  * limitations under the License. 
  */
 
-package com.mrvelibor.logintest.tusd;
+package com.mrvelibor.logintest.security.saml;
 
 import java.lang.annotation.*;
 

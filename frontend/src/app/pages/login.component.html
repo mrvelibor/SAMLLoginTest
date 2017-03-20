@@ -16,6 +16,6 @@
       <button [disabled]="loading" class="btn btn-primary" id="login-button">Login</button>
       <img *ngIf="loading" src="/assets/spinner32.svg"/>
     </div>
-    <p *ngIf="!loading"><a href="/saml/login">Log in using SAML</a></p>
+    <p *ngIf="!loading" class="message"><a href="/saml/login">Log in using SAML</a></p>
   </form>
 </div>

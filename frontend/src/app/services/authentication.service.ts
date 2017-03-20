@@ -50,23 +50,31 @@ export class AuthenticationService extends PhpService {
     });
   }
 
+  auth() {
+    let options = PhpService.createOptions();
+    return this.http.get(
+      PhpService._host + '/auth',
+      options
+    ).map((res: Response) => {
+      return this.handleResponse(res);
+    });
+  }
+
   logout() {
     let user = this._user;
     if(!user) {
       return;
     }
 
-    localStorage.removeItem('user');
-    this._userSource.next(null);
-
-    let options = PhpService.createOptions(user.token);
-    return this.http.delete(
+    let options = PhpService.createOptions(/*user.token*/);
+    return this.http.get(
       PhpService._host + '/logout',
       options
     ).map((res: Response) => {
+      console.log(res);
       localStorage.removeItem('user');
       this._userSource.next(null);
-      return res.json();
+      return res;
     });
   }
 
